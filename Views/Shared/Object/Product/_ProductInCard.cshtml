@@ -1,0 +1,123 @@
+﻿
+@model DomainProduct.Entities.Product
+
+@*
+    reference: https://developers.google.com/search/docs/data-types/product
+*@
+
+<div id="Product_@Model.IdProduct" data-id="Product_@Model.IdProduct" class="ui card produto product-in-card" data-exhausted="@Model.FlagExhausted" itemscope itemtype="http://schema.org/Product">
+    <input type="hidden" id="selected-references_@Model.IdProduct" />
+    <meta itemprop="productID" content="@Model.IdProduct">
+    <div class="content">
+        
+        @if (Model.PricePromotion != null && Model.PricePromotion > 0){
+            <div class="box-label">
+                <label class="discount-label">-@string.Format("{0:n0}", (Model.Price / Model.PricePromotion -1) * 100)% off</label>
+            </div>
+        }
+        
+        @{
+            List<DomainCustomer.Entities.Wishlist.WishlistItem> wishList = null;
+            bool inlist = false;
+            string color = "grey";
+            string textListaDesejo = "Adicionar à lista de desejos";
+            string combinacoes = "";
+
+            if (Request.Cookies["WishList"] == null)
+            {
+                @Html.Action("LoadWishListCookie", "Customer")
+            }
+
+            wishList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DomainCustomer.Entities.Wishlist.WishlistItem>>(Request.Cookies["WishList"] != null ? HttpUtility.UrlDecode(Request.Cookies["WishList"].Value) : string.Empty);
+
+            if (wishList != null)
+            {
+                if (Model.AvailableReferences == null || Model.AvailableReferences.Count() == 0)
+                {
+                    inlist = wishList.Find(p => p.IdProduct == Model.IdProduct) != null ? true : false;
+                }
+            }
+            if (inlist)
+            {
+                color = "red";
+                textListaDesejo = "Remover da lista de desejos";
+
+
+            }
+        }
+        @if (Model.AlternativeImage != null)
+        {
+            <a class="ui slide masked reveal image fluid" itemprop="url" href="@(Model.UrlFriendlyCustom != null ? Model.UrlFriendlyCustom : Model.UrlFriendly)" title="@Model.Name">
+                <img itemprop="image" id="mainImageCard_@Model.IdProduct" src="/assets/image/img_default.png" data-src="@(Model.ImageHome != null ? Model.ImageHome : "/assets/image/img_default.png")" class="visible content" onerror="imgError(this)" alt="@Model.Name" title="@Model.Name">
+                <img src="@Model.AlternativeImage" class="hidden content" onerror="imgError(this)" alt="@Model.Name" title="@Model.Name">
+
+                @if (Model.SealStatus != null && Model.SealStatus.Name != "Normal")
+                {
+                    <div class="ui bottom right attached label massive imagetag">
+                        <img src="@Model.SealStatus.Image" alt="@Model.SealStatus.Name" class="ui image tiny" onerror="imgError(this)" alt="@Model.Name" title="@Model.Name">
+                    </div>
+                }
+            </a>
+        }
+        else
+        {
+            <a class="ui image fluid" itemprop="url" href="@(Model.UrlFriendlyCustom != null ? Model.UrlFriendlyCustom : Model.UrlFriendly)" title="@Model.Name">
+                <img id="mainImageCard_@Model.IdProduct" src="@(Model.ImageHome != null ? Model.ImageHome : "/assets/image/img_default.png")" class="visible content" onerror="imgError(this)" alt="@Model.Name" title="@Model.Name">
+                @if (Model.SealStatus != null && Model.SealStatus.Name != "Normal")
+                {
+                    <div class="ui bottom right attached label massive imagetag">
+                        <img src="@Model.SealStatus.Image" class="ui image tiny" onerror="imgError(this)" alt="@Model.Name" title="@Model.Name">
+                    </div>
+                }
+            </a>
+        }
+        
+        <div class="info-prod">
+            <a href="@(Model.UrlFriendlyCustom != null ? Model.UrlFriendlyCustom : Model.UrlFriendly)" title="@Model.Name">
+                <h3>
+                    <span itemprop="name">
+                        @Model.Name
+                    </span>
+                </h3>
+            </a>
+
+            <h4 class="b-divider"> </h4>
+
+            @if (Model.PricePromotion != null && Model.PricePromotion > 0){
+                <span id="basePrice_@Model.IdProduct" class="precoBase"><i>@string.Format("{0:c}", Model.Price)</i>  @(Session["segment"] != null && Session["segment"].ToString() == "b2b" && Model.AvailableReferences != null ? "" : string.Empty)</span>
+                <span class="preco">  R$<span itemprop="price">@string.Format("{0:n2}", Model.PricePromotion)</span></span>
+            }else{
+                <span id="price_@Model.IdProduct" class="preco" itemprop="price">
+                    <span class="precoBase">
+                        @(Session["segment"] != null && Session["segment"].ToString() == "b2b" && Model.AvailableReferences != null ? "" : string.Empty)
+                    </span>
+                    R$ @string.Format("{0:n2}", Model.Price)                    
+                </span>
+            }
+          
+        </div>
+        <div class="hover">
+            @{
+                bool isb2b = Session["segment"] != null && Session["segment"].ToString() == "b2b" ? true : false;
+
+                DomainAssistedSale.Entities.Seller _assistedSale = (DomainAssistedSale.Entities.Seller)Session["Seller"];
+                bool isAssistedSale = _assistedSale != null ? true : false;
+
+                <a href="@(Model.UrlFriendlyCustom != null ? Model.UrlFriendlyCustom : Model.UrlFriendly)" title="Comprar" class="btn-cart-prod" data-idproduct="@Model.IdProduct" data-name="Model.Name">
+                    <i id="btn-icon-card-Model.IdProduct" class="icon shopping bag"></i>
+                </a>
+
+                if (!Model.HasConjunct && !isb2b && !isAssistedSale)
+                {
+                    
+                    <div class="bcg-heart wishlist-btn" data-wishlist-local="card" data-tooltip="@textListaDesejo" data-position="top right">
+                        <i class="wishlist-item icon heart @color" data-in-list="@inlist" data-have-sku="@(Model.AvailableReferences != null && Model.AvailableReferences.Count() > 0 ? "true" : "false")" data-product-id="@Model.IdProduct"></i>
+                    </div>
+                   
+                }
+            }
+           
+            
+        </div>
+    </div>
+</div>

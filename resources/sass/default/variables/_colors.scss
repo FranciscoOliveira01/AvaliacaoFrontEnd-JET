@@ -1,0 +1,33 @@
+/*
+  *
+  General Colors
+  *
+*/
+$primary-color: #000;
+$secondary-color: #000000b8;
+$active-color: #000000b8;
+$ascent-1-color: rgb(233, 86, 27);
+$ascent-2-color: rgb(209, 106, 47);
+$ascent-3-color: rgb(33, 128, 145);
+$ascent-4-color: #1D2A37;
+$ascent-5-color: #131C24;
+$action: #529c67;
+
+
+/*
+  *
+  Checkout Colors
+  *
+*/
+$bg-checkout-success: $primary-color; //#21ba45;
+$text-checkout-success: #FFF;
+
+$bg-checkout-success-dark: darken($primary-color, 5); //#0e4f1d;
+$text-checkout-success-dark: #FFF;
+
+$button-bg-checkout-success-dark: transparent;
+$button-border-checkout-success-dark: #FFF;
+$button-text-checkout-success-dark: #FFF;
+
+$bg-checkout-error: #DB2828;
+$text-checkout-error: #FFF;
