@@ -22,7 +22,7 @@
         "jquery-mask-plugin": "^1.14.13",
         "jquery-maskmoney": "^3.0.2",
         "jquery-touch-events": "^1.0.7",
-        "jquery-validation": "^1.17.0",
+        "jquery-validation": "^1.19.5",
         "mobile-detect": "^1.4.2",
         "sass-semantic-ui": "^2.2.12-3",
         "semantic-ui-calendar": "0.0.8",
